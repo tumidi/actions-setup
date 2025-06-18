@@ -1,0 +1,33 @@
+name: Set up Python
+description: Set up Python and install project dependencies
+
+inputs:
+  python-version:
+    description: Python version (e.g. `3.12`).
+    required: true
+  poetry-version-spec:
+    description: Poetry version specifier.
+    default: ">=2.1.3,<3.0.0"
+  poetry-options:
+    description: Additional poetry install options.
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    # setup-python's poetry caching requires poetry to be installed, so we install it before python.
+    - name: Install Poetry
+      run: pipx install "poetry${{ inputs.poetry-version-spec }}"
+      shell: bash
+
+    - name: Set up Python ${{ inputs.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: "${{ inputs.python-version }}"
+        cache: "poetry"
+
+    - name: Install dependencies
+      run: poetry install --no-interaction ${{ inputs.poetry-options }}
+      shell: bash
+      env:
+        POETRY_VIRTUALENVS_IN_PROJECT: true

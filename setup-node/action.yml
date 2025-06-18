@@ -1,0 +1,25 @@
+name: Set up Node.js
+description: Set up Node.js and install frontend dependencies
+
+inputs:
+  node-version:
+    description: Node version
+    required: true
+  prefix:
+    description: Directory in which npm searches for the `package.json` file.
+    required: true
+    default: "."
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+        cache-dependency-path: ${{ inputs.prefix }}/package-lock.json
+
+    - name: Install frontend dependencies
+      run: npm ci --ignore-scripts --prefix ${{ inputs.prefix }}
+      shell: bash
